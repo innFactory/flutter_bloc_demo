@@ -1,9 +1,7 @@
-import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc_demo/bloc/bloc_provider.dart';
-import 'package:flutter_bloc_demo/bloc/current_color_bloc.dart';
 
 class RandomColorCard extends StatefulWidget {
   RandomColorCard({Key key}) : super(key: key);
@@ -12,35 +10,13 @@ class RandomColorCard extends StatefulWidget {
 }
 
 class _RandomColorCardState extends State<RandomColorCard> {
-  StreamSubscription<Color> _currentColorListener;
   Color _currentColor;
 
   @override
   void initState() {
     super.initState();
 
-    // listen to offers from bloc
-    this.initListeners();
-  }
-
-  void initListeners() {
-    this._currentColorListener = BlocProvider.of<CurrentColorBloc>(context)
-        .colorObservable
-        .listen(this._updateColor);
-  }
-
-  @override
-  void dispose() {
-    if (_currentColorListener != null) {
-      _currentColorListener.cancel();
-    }
-    super.dispose();
-  }
-
-  void _updateColor(Color c) {
-    this.setState(() {
-      this._currentColor = c;
-    });
+    _currentColor = _generateRandomColor();
   }
 
   @override
@@ -63,6 +39,13 @@ class _RandomColorCardState extends State<RandomColorCard> {
   }
 
   void _onTap() {
-    BlocProvider.of<CurrentColorBloc>(context).generateColor();
+    setState(() {
+      _currentColor = _generateRandomColor();
+    });
+  }
+
+  static Color _generateRandomColor() {
+    return Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
+        .withOpacity(1.0);
   }
 }
