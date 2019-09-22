@@ -4,7 +4,6 @@ import 'package:flutter_bloc_demo/bloc/bloc_provider.dart';
 import 'package:flutter_bloc_demo/bloc/color_list_bloc.dart';
 import 'package:flutter_bloc_demo/bloc/current_color_bloc.dart';
 import 'package:flutter_bloc_demo/components/bottom_navigation/bottom_nav_custom.dart';
-import 'package:flutter_bloc_demo/components/random_color_card.dart';
 import 'package:flutter_bloc_demo/routes.dart';
 
 class ColorGeneratorPage extends StatelessWidget {
@@ -18,7 +17,7 @@ class ColorGeneratorPage extends StatelessWidget {
             automaticallyImplyLeading: false),
         body: Center(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-          RandomColorCard(),
+          Container(), // TODO: Replace this container with a RandomColorCard(),
           _renderAddToListButton(context)
         ])),
         bottomNavigationBar: BottomNavBarCustom(currentLocation: 1));
