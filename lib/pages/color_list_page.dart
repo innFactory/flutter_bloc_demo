@@ -1,49 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_demo/bloc/bloc_provider.dart';
 import 'package:flutter_bloc_demo/bloc/color_list_bloc.dart';
 import 'package:flutter_bloc_demo/components/bottom_navigation/bottom_nav_custom.dart';
 import 'package:flutter_bloc_demo/routes.dart';
 
-class ColorListPage extends StatefulWidget {
-  ColorListPage({Key key}) : super(key: key);
-
-  _ColorListPageState createState() => _ColorListPageState();
-}
-
-class _ColorListPageState extends State<ColorListPage> {
-  StreamSubscription<List<Color>> _colorListListener;
-  List<Color> _colorList;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // listen to offers from bloc
-    this.initListeners();
-  }
-
-  void initListeners() {
-    this._colorListListener = BlocProvider.of<ColorListBloc>(context)
-        .colorListObservable
-        .listen(this._updateColorList);
-  }
-
-  @override
-  void dispose() {
-    if (_colorListListener != null) {
-      _colorListListener.cancel();
-    }
-    super.dispose();
-  }
-
-  void _updateColorList(List<Color> colorList) {
-    this.setState(() {
-      this._colorList = colorList;
-    });
-  }
-
+class ColorListPage extends StatelessWidget {
+  const ColorListPage({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,29 +16,32 @@ class _ColorListPageState extends State<ColorListPage> {
             IconButton(
               icon: const Icon(Icons.delete_forever),
               tooltip: 'Delete all colors',
-              onPressed: _onDeleteAll,
+              onPressed: () => _onDeleteAll(context),
             ),
           ],
         ),
-        body: _colorList != null ? _renderGrid() : SizedBox.shrink(),
+        body: _renderGrid(context),
         bottomNavigationBar: BottomNavBarCustom(currentLocation: 2));
   }
 
-  Widget _renderGrid() {
-    return GridView.count(
-        crossAxisCount: 5,
-        children: _colorList
-            .map((c) => Container(
+  Widget _renderGrid(BuildContext context) {
+    ColorListBloc colorListBloc = BlocProvider.of<ColorListBloc>(context);
+
+    return StreamBuilder(
+        initialData: [],
+        stream: colorListBloc.colorListObservable,
+        builder: (BuildContext context, snapShot) => GridView.count(
+            crossAxisCount: 5,
+            children: List<Widget>.from(snapShot.data.map((c) => Container(
                   height: 100,
                   width: 100,
                   padding: EdgeInsets.all(20.0),
                   color: c,
                   margin: EdgeInsets.all(1.0),
-                ))
-            .toList());
+                )))));
   }
 
-  void _onDeleteAll() {
+  void _onDeleteAll(BuildContext context) {
     BlocProvider.of<ColorListBloc>(context).deleteAllColors();
   }
 }

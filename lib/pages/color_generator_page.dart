@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc_demo/bloc/bloc_provider.dart';
@@ -9,43 +7,8 @@ import 'package:flutter_bloc_demo/components/bottom_navigation/bottom_nav_custom
 import 'package:flutter_bloc_demo/components/random_color_card.dart';
 import 'package:flutter_bloc_demo/routes.dart';
 
-class ColorGeneratorPage extends StatefulWidget {
-  ColorGeneratorPage({Key key}) : super(key: key);
-
-  _ColorGeneratorPageState createState() => _ColorGeneratorPageState();
-}
-
-class _ColorGeneratorPageState extends State<ColorGeneratorPage> {
-  StreamSubscription<Color> _currentColorListener;
-  Color _currentColor;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // listen to offers from bloc
-    this.initListeners();
-  }
-
-  void initListeners() {
-    this._currentColorListener = BlocProvider.of<CurrentColorBloc>(context)
-        .colorObservable
-        .listen(this._updateColor);
-  }
-
-  @override
-  void dispose() {
-    if (_currentColorListener != null) {
-      _currentColorListener.cancel();
-    }
-    super.dispose();
-  }
-
-  void _updateColor(Color c) {
-    this.setState(() {
-      this._currentColor = c;
-    });
-  }
+class ColorGeneratorPage extends StatelessWidget {
+  const ColorGeneratorPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,24 +17,31 @@ class _ColorGeneratorPageState extends State<ColorGeneratorPage> {
             title: Text(Routes.COLOR_GENERATOR.name),
             automaticallyImplyLeading: false),
         body: Center(
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [RandomColorCard(), _renderAddToListButton()])),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+          RandomColorCard(),
+          _renderAddToListButton(context)
+        ])),
         bottomNavigationBar: BottomNavBarCustom(currentLocation: 1));
   }
 
-  Widget _renderAddToListButton() {
+  Widget _renderAddToListButton(BuildContext context) {
+    CurrentColorBloc currentColorBloc =
+        BlocProvider.of<CurrentColorBloc>(context);
+
     return Container(
         height: 100,
         child: Center(
-          child: RaisedButton(
+            child: StreamBuilder(
+          initialData: Colors.red,
+          stream: currentColorBloc.colorObservable,
+          builder: (BuildContext context, snapShot) => RaisedButton(
             child: Text("Add to List"),
-            onPressed: _onAddToList,
+            onPressed: () => _onAddToList(context, snapShot.data),
           ),
-        ));
+        )));
   }
 
-  void _onAddToList() {
-    BlocProvider.of<ColorListBloc>(context).addColor(_currentColor);
+  void _onAddToList(BuildContext context, Color currentColor) {
+    BlocProvider.of<ColorListBloc>(context).addColor(currentColor);
   }
 }
