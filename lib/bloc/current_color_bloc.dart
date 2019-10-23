@@ -18,7 +18,7 @@ class CurrentColorBloc extends BlocBase {
         BehaviorSubject<Color>.seeded(_generateRandomColor());
   }
 
-  Observable<Color> get displaySplashScreenObservable =>
+  Observable<Color> get currentColorObservable =>
       this._currentColorPublisher.stream;
 
   void generateColor() {

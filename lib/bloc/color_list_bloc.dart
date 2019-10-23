@@ -17,9 +17,6 @@ class ColorListBloc extends BlocBase {
     this._colorListPublisher = BehaviorSubject<List<Color>>.seeded(_colors);
   }
 
-  Observable<List<Color>> get displaySplashScreenObservable =>
-      this._colorListPublisher.stream;
-
   void addColor(Color color) {
     _colors.add(color);
     this._colorListPublisher.sink.add(_colors);
